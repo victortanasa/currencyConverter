@@ -3,6 +3,7 @@ package com.currencyconverter.service;
 import com.currencyconverter.util.CurrencyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +20,16 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class StaticFileExchangeRateProvider implements ExchangeRateProvider {
+public class InMemoryExchangeRateProvider implements ExchangeRateProvider {
+
+    // keyed on the normalized codes, so " eur " and "EUR" share one entry
+    private static final String CACHE_KEY = "T(com.currencyconverter.util.CurrencyUtils).normalize(#sourceCurrency)"
+            + " + '-' + T(com.currencyconverter.util.CurrencyUtils).normalize(#targetCurrency)";
 
     private final Map<String, Map<String, BigDecimal>> ratesBySourceCurrency;
     private final Set<String> knownCurrencies;
 
-    public StaticFileExchangeRateProvider(
+    public InMemoryExchangeRateProvider(
             final ExchangeRatesLoader exchangeRatesLoader,
             @Value("${exchange-rates.location:classpath:rates.json}") final Resource location) {
         this.ratesBySourceCurrency = exchangeRatesLoader.load(location);
@@ -33,6 +38,7 @@ public class StaticFileExchangeRateProvider implements ExchangeRateProvider {
     }
 
     @Override
+    @Cacheable(cacheNames = "rates", key = CACHE_KEY)
     public BigDecimal getRate(final String sourceCurrency, final String targetCurrency) {
         final String source = CurrencyUtils.normalize(sourceCurrency);
         final String target = CurrencyUtils.normalize(targetCurrency);

@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 
 @ExtendWith(MockitoExtension.class)
-class StaticFileExchangeRateProviderTest {
+class InMemoryExchangeRateProviderTest {
 
     private static final String EUR = "EUR";
     private static final String USD = "USD";
@@ -28,17 +28,17 @@ class StaticFileExchangeRateProviderTest {
     @Mock
     private Resource location;
 
-    private StaticFileExchangeRateProvider createProvider() {
+    private InMemoryExchangeRateProvider createProvider() {
         when(exchangeRatesLoader.load(location)).thenReturn(Map.of(
                 EUR, Map.of(USD, new BigDecimal("1.2"), GBP, new BigDecimal("0.8"), AUD, new BigDecimal("1.6")),
                 USD, Map.of(EUR, new BigDecimal("0.83"), CAD, new BigDecimal("1.3"))));
-        return new StaticFileExchangeRateProvider(exchangeRatesLoader, location);
+        return new InMemoryExchangeRateProvider(exchangeRatesLoader, location);
     }
 
     @Test
     void returnsDirectQuoteIgnoringCaseAndWhitespace() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when
         final BigDecimal rate = provider.getRate(" eur ", "usd");
@@ -50,7 +50,7 @@ class StaticFileExchangeRateProviderTest {
     @Test
     void prefersDirectQuoteOverDerivedRate() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when
         final BigDecimal rate = provider.getRate(USD, EUR);
@@ -62,7 +62,7 @@ class StaticFileExchangeRateProviderTest {
     @Test
     void derivesRateThroughBaseCurrencyWhenNoDirectQuote() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when
         final BigDecimal rate = provider.getRate(USD, GBP);
@@ -74,7 +74,7 @@ class StaticFileExchangeRateProviderTest {
     @Test
     void sameCurrencyHasRateOne() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when
         final BigDecimal rate = provider.getRate(GBP, GBP);
@@ -86,7 +86,7 @@ class StaticFileExchangeRateProviderTest {
     @Test
     void rejectsUnknownSourceCurrency() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when / then
         assertThatThrownBy(() -> provider.getRate(UNKNOWN, USD))
@@ -97,7 +97,7 @@ class StaticFileExchangeRateProviderTest {
     @Test
     void rejectsUnknownTargetCurrency() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when / then
         assertThatThrownBy(() -> provider.getRate(USD, UNKNOWN))
@@ -108,7 +108,7 @@ class StaticFileExchangeRateProviderTest {
     @Test
     void rejectsKnownCurrenciesWithoutCommonBase() {
         // given
-        final StaticFileExchangeRateProvider provider = createProvider();
+        final InMemoryExchangeRateProvider provider = createProvider();
 
         // when / then
         assertThatThrownBy(() -> provider.getRate(AUD, CAD))

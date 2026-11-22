@@ -4,3 +4,8 @@ server:
 spring:
   application:
     name: currency-converter
+  cache:
+    type: caffeine
+    cache-names: rates
+    caffeine:
+      spec: expireAfterWrite=5m,maximumSize=10000
