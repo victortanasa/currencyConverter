@@ -17,6 +17,7 @@ class CurrencyConversionServiceTest {
 
     private static final String EUR = "EUR";
     private static final String USD = "USD";
+    private static final String JPY = "JPY";
     private static final String UNKNOWN = "XYZ";
 
     @Mock
@@ -50,6 +51,20 @@ class CurrencyConversionServiceTest {
         // then
         assertThat(result).isEqualByComparingTo("0.02");
         assertThat(result.scale()).isEqualTo(2);
+    }
+
+    @Test
+    void roundsToTargetCurrencyMinorUnits() {
+        // given
+        when(exchangeRateProvider.getRate(EUR, JPY)).thenReturn(new BigDecimal("160.555"));
+        final ConversionRequest request = new ConversionRequest(EUR, JPY, new BigDecimal("1"));
+
+        // when
+        final BigDecimal result = currencyConversionService.convert(request).convertedAmount();
+
+        // then
+        assertThat(result).isEqualByComparingTo("161");
+        assertThat(result.scale()).isZero();
     }
 
     @Test

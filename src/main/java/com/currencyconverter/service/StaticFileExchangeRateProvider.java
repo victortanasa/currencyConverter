@@ -1,15 +1,16 @@
 package com.currencyconverter.service;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.currencyconverter.util.CurrencyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Serves rates from memory; the file is loaded once at startup. A direct quote is used when one
@@ -33,8 +34,8 @@ public class StaticFileExchangeRateProvider implements ExchangeRateProvider {
 
     @Override
     public BigDecimal getRate(final String sourceCurrency, final String targetCurrency) {
-        final String source = normalize(sourceCurrency);
-        final String target = normalize(targetCurrency);
+        final String source = CurrencyUtils.normalize(sourceCurrency);
+        final String target = CurrencyUtils.normalize(targetCurrency);
 
         validateCurrency(source, sourceCurrency);
         validateCurrency(target, targetCurrency);
@@ -59,10 +60,6 @@ public class StaticFileExchangeRateProvider implements ExchangeRateProvider {
         if (!knownCurrencies.contains(normalizedCode)) {
             throw new UnsupportedCurrencyException(originalCode);
         }
-    }
-
-    private static String normalize(final String currencyCode) {
-        return currencyCode.trim().toUpperCase(Locale.ROOT);
     }
 
     private static Set<String> knownCurrenciesOf(final Map<String, Map<String, BigDecimal>> ratesBySourceCurrency) {

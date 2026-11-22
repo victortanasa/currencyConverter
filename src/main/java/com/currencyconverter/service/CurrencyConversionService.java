@@ -2,11 +2,16 @@ package com.currencyconverter.service;
 
 import com.currencyconverter.dto.ConversionRequest;
 import com.currencyconverter.dto.ConversionResponse;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.javamoney.moneta.Money;
 import org.springframework.stereotype.Service;
+
+import javax.money.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import static com.currencyconverter.util.CurrencyUtils.normalize;
 
 /**
  * Converts amounts between currencies using the rate supplied by an {@link ExchangeRateProvider}.
@@ -16,17 +21,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CurrencyConversionService {
 
-    private static final int RESULT_SCALE = 2;
-
     private final ExchangeRateProvider exchangeRateProvider;
 
     public ConversionResponse convert(final ConversionRequest request) {
         log.debug("Converting {} {} to {}", request.amount(), request.sourceCurrency(), request.targetCurrency());
         final BigDecimal rate = exchangeRateProvider.getRate(request.sourceCurrency(), request.targetCurrency());
 
-        // rounded exactly once, at the end
-        final BigDecimal convertedAmount = request.amount().multiply(rate).setScale(RESULT_SCALE, RoundingMode.HALF_UP);
+        // Why MonetaryAmount (Moneta) instead of a bare BigDecimal:
+        // - rounding comes from the currency: Monetary.getRounding(...) rounds to the target currency's
+        //   minor units (EUR 2, JPY 0, KWD 3) instead of a hard-coded 2 decimals
+        // - Money keeps up to 256 digits while multiplying, so nothing is lost before the single final rounding
+        // - currency codes are validated against ISO 4217
+        final CurrencyUnit target = Monetary.getCurrency(normalize(request.targetCurrency()));
+        final MonetaryAmount source = Money.of(request.amount(), normalize(request.sourceCurrency()));
 
-        return new ConversionResponse(convertedAmount);
+        final MonetaryAmount converted = Money.of(source.multiply(rate).getNumber(), target).with(roundingFor(target));
+
+        return new ConversionResponse(converted.getNumber().numberValueExact(BigDecimal.class));
     }
+
+    private static MonetaryOperator roundingFor(final CurrencyUnit currency) {
+        return Monetary.getRounding(RoundingQueryBuilder.of()
+                .setCurrency(currency)
+                .set(RoundingMode.HALF_UP)
+                .build());
+    }
+
 }

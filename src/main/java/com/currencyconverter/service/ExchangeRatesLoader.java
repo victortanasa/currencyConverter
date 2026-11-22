@@ -1,6 +1,7 @@
 package com.currencyconverter.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.currencyconverter.util.CurrencyUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -9,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -60,7 +60,7 @@ public class ExchangeRatesLoader {
         if (block.source() == null || block.source().isBlank()) {
             throw new IllegalStateException("Rate block without a source currency in " + location);
         }
-        return block.source().trim().toUpperCase(Locale.ROOT);
+        return CurrencyUtils.normalize(block.source());
     }
 
     private static Map<String, BigDecimal> quotesOf(final String base, final ExchangeRatesData block) {
