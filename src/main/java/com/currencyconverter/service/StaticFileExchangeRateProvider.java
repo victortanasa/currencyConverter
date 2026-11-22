@@ -1,68 +1,73 @@
 package com.currencyconverter.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.math.MathContext;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 /**
- * Loads EUR-based rates once at startup from a JSON file and serves them from memory.
- * Fails fast if the file is missing or malformed.
+ * Serves rates from memory; the file is loaded once at startup. A direct quote is used when one
+ * exists. Otherwise the rate is derived through the first base currency, in file order, that quotes
+ * both currencies.
  */
 @Slf4j
 @Component
 public class StaticFileExchangeRateProvider implements ExchangeRateProvider {
 
-    private static final String BASE_CURRENCY = "EUR";
-
-    private final Map<String, BigDecimal> ratesPerEur;
+    private final Map<String, Map<String, BigDecimal>> ratesBySourceCurrency;
+    private final Set<String> knownCurrencies;
 
     public StaticFileExchangeRateProvider(
-            final ObjectMapper objectMapper,
+            final ExchangeRatesLoader exchangeRatesLoader,
             @Value("${exchange-rates.location:classpath:rates.json}") final Resource location) {
-        this.ratesPerEur = load(objectMapper, location);
-        log.info("Loaded {} exchange rates from {}", ratesPerEur.size(), location);
+        this.ratesBySourceCurrency = exchangeRatesLoader.load(location);
+        this.knownCurrencies = knownCurrenciesOf(ratesBySourceCurrency);
+        log.info("Loaded rates for {} base currencies from {}", ratesBySourceCurrency.size(), location);
     }
 
     @Override
-    public BigDecimal getRateFor(final String currencyCode) {
-        final BigDecimal rate = ratesPerEur.get(currencyCode.trim().toUpperCase(Locale.ROOT));
-        if (rate == null) {
-            throw new UnsupportedCurrencyException(currencyCode);
+    public BigDecimal getRate(final String sourceCurrency, final String targetCurrency) {
+        final String source = normalize(sourceCurrency);
+        final String target = normalize(targetCurrency);
+
+        validateCurrency(source, sourceCurrency);
+        validateCurrency(target, targetCurrency);
+
+        if (source.equals(target)) {
+            return BigDecimal.ONE;
         }
-        return rate;
+
+        final BigDecimal direct = ratesBySourceCurrency.getOrDefault(source, Map.of()).get(target);
+        if (direct != null) {
+            return direct;
+        }
+
+        return ratesBySourceCurrency.values().stream()
+                .filter(quotes -> quotes.containsKey(source) && quotes.containsKey(target))
+                .findFirst()
+                .map(quotes -> quotes.get(target).divide(quotes.get(source), MathContext.DECIMAL128))
+                .orElseThrow(() -> new UnsupportedCurrencyException(sourceCurrency, targetCurrency));
     }
 
-    private static Map<String, BigDecimal> load(final ObjectMapper objectMapper, final Resource location) {
-        final ExchangeRatesData data;
-        try (InputStream inputStream = location.getInputStream()) {
-            data = objectMapper.readValue(inputStream, ExchangeRatesData.class);
-        } catch (final IOException e) {
-            throw new UncheckedIOException("Unable to read exchange rates from " + location, e);
+    private void validateCurrency(final String normalizedCode, final String originalCode) {
+        if (!knownCurrencies.contains(normalizedCode)) {
+            throw new UnsupportedCurrencyException(originalCode);
         }
-        if (data.quotes() == null || data.quotes().isEmpty()) {
-            throw new IllegalStateException("Exchange rates file has no usable quotes: " + location);
-        }
+    }
 
-        final Map<String, BigDecimal> rates = new HashMap<>();
-        rates.put(BASE_CURRENCY, BigDecimal.ONE);
-        data.quotes().forEach((pair, rate) -> {
-            if (!pair.startsWith(BASE_CURRENCY)
-                    || pair.length() == BASE_CURRENCY.length()
-                    || rate == null
-                    || rate.signum() <= 0) {
-                throw new IllegalStateException("Invalid exchange rate entry: " + pair + "=" + rate);
-            }
-            rates.put(pair.substring(BASE_CURRENCY.length()), rate);
-        });
-        return Map.copyOf(rates);
+    private static String normalize(final String currencyCode) {
+        return currencyCode.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private static Set<String> knownCurrenciesOf(final Map<String, Map<String, BigDecimal>> ratesBySourceCurrency) {
+        final Set<String> currencies = new HashSet<>(ratesBySourceCurrency.keySet());
+        ratesBySourceCurrency.values().forEach(quotes -> currencies.addAll(quotes.keySet()));
+        return Set.copyOf(currencies);
     }
 }

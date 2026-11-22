@@ -18,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class CurrencyConverterApplicationTest {
 
+    private static final String EUR = "EUR";
+    private static final String USD = "USD";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -27,11 +30,12 @@ class CurrencyConverterApplicationTest {
     @Test
     void loadsRatesFromProvidedFile() {
         // when
-        final BigDecimal usd = exchangeRateProvider.getRateFor("usd");
+        final BigDecimal eurToUsd = exchangeRateProvider.getRate(EUR, "usd");
+        final BigDecimal usdToEur = exchangeRateProvider.getRate(USD, EUR);
 
         // then
-        assertThat(usd).isEqualByComparingTo("1.16063");
-        assertThat(exchangeRateProvider.getRateFor("EUR")).isEqualByComparingTo("1");
+        assertThat(eurToUsd).isEqualByComparingTo("1.16063");
+        assertThat(usdToEur).isEqualByComparingTo("0.90992");
     }
 
     @Test
@@ -42,5 +46,15 @@ class CurrencyConverterApplicationTest {
                         .content("{\"sourceCurrency\":\"EUR\",\"targetCurrency\":\"USD\",\"amount\":100}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.convertedAmount").value(116.06));
+    }
+
+    @Test
+    void derivesRateBetweenCurrenciesWithoutDirectQuote() throws Exception {
+        // AUD has no block of its own, so AUD -> SEK is derived through EUR: 11.03937 / 1.639644 * 100
+        mockMvc.perform(post("/api/conversions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"sourceCurrency\":\"AUD\",\"targetCurrency\":\"SEK\",\"amount\":100}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.convertedAmount").value(673.28));
     }
 }

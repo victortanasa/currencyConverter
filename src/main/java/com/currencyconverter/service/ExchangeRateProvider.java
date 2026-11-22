@@ -3,14 +3,15 @@ package com.currencyconverter.service;
 import java.math.BigDecimal;
 
 /**
- * Source of EUR-based exchange rates.
+ * Source of exchange rates between currencies.
  */
 public interface ExchangeRateProvider {
 
     /**
-     * @param currencyCode ISO currency code, case-insensitive
-     * @return units of the given currency per 1 EUR
-     * @throws UnsupportedCurrencyException if no rate is known for the currency
+     * @param sourceCurrency ISO currency code to convert from, case-insensitive
+     * @param targetCurrency ISO currency code to convert to, case-insensitive
+     * @return units of the target currency per 1 unit of the source currency
+     * @throws UnsupportedCurrencyException if either currency is unknown or no rate can be derived
      */
-    BigDecimal getRateFor(String currencyCode);
+    BigDecimal getRate(String sourceCurrency, String targetCurrency);
 }

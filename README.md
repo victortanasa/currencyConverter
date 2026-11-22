@@ -1,7 +1,7 @@
 # Currency Converter
 
 Spring Boot (Java 21) REST API that converts an amount between currencies using
-EUR-based exchange rates from `src/main/resources/rates.json`.
+exchange rates from `src/main/resources/rates.json`.
 
 ## Run
 
@@ -32,10 +32,17 @@ Also available: Swagger UI at `/swagger-ui.html` and health at `/actuator/health
 
 ## Design decisions and trade-offs
 
-- **Cross rates via EUR**: `result = amount * rate(target) / rate(source)`, so any pair in the
-  rates file works. `EUR` itself is implicitly supported with rate 1.
-- **`BigDecimal` everywhere**, never `double`. Multiplication happens first and division last, so the
-  result is rounded exactly once, to 2 decimals with `HALF_UP`.
+- **Multiple base currencies**: `rates.json` is a list of blocks, one per base currency (currently
+  EUR, USD and RON), each with quotes like `EURUSD`. No base currency is hard-coded, so adding one is
+  a data change. The EUR block is the assignment's data. The USD and RON blocks are real ECB
+  reference rates (via frankfurter.dev, 2026-11-20), so they come from a different date than the EUR
+  block and are not exactly consistent with it (e.g. `USDEUR` is not `1 / EURUSD`).
+- **Rate lookup**: a direct quote is used when one exists (`USD` → `EUR`). Otherwise the rate is
+  derived through the first base, in file order, that quotes both currencies (`rate = quote(target) /
+  quote(source)`, `DECIMAL128` precision), so e.g. `AUD` → `SEK` works via EUR. Currencies with no
+  common base return a 400.
+- **`BigDecimal` everywhere**, never `double`. The result is `amount * rate`, rounded exactly once,
+  to 2 decimals with `HALF_UP`.
 - **No database**: the rates are a static, read-only reference file, so they are loaded once at
   startup into an immutable in-memory map. The file is validated and the app fails fast if it is
   missing or malformed.

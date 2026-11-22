@@ -1,15 +1,47 @@
-{
-  "source": "EUR",
-  "quotes": {
-    "EURAUD": 1.639644,
-    "EURBRL": 6.03858,
-    "EURCAD": 1.609968,
-    "EURCHF": 0.940244,
-    "EURGBP": 0.856017,
-    "EURNOK": 10.90808,
-    "EURPLN": 4.325559,
-    "EURRON": 5.246629,
-    "EURSEK": 11.03937,
-    "EURUSD": 1.16063
+[
+  {
+    "source": "EUR",
+    "quotes": {
+      "EURAUD": 1.639644,
+      "EURBRL": 6.03858,
+      "EURCAD": 1.609968,
+      "EURCHF": 0.940244,
+      "EURGBP": 0.856017,
+      "EURNOK": 10.90808,
+      "EURPLN": 4.325559,
+      "EURRON": 5.246629,
+      "EURSEK": 11.03937,
+      "EURUSD": 1.16063
+    }
+  },
+  {
+    "source": "USD",
+    "quotes": {
+      "USDAUD": 1.5002,
+      "USDBRL": 5.938,
+      "USDCAD": 1.4307,
+      "USDCHF": 0.83922,
+      "USDEUR": 0.90992,
+      "USDGBP": 0.76192,
+      "USDNOK": 9.7525,
+      "USDPLN": 4.0567,
+      "USDRON": 4.8674,
+      "USDSEK": 10.2025
+    }
+  },
+  {
+    "source": "RON",
+    "quotes": {
+      "RONAUD": 0.30821,
+      "RONBRL": 1.22,
+      "RONCAD": 0.29393,
+      "RONCHF": 0.17242,
+      "RONEUR": 0.18694,
+      "RONGBP": 0.15653,
+      "RONNOK": 2.0036,
+      "RONPLN": 0.83344,
+      "RONSEK": 2.0961,
+      "RONUSD": 0.20545
+    }
   }
-}
+]

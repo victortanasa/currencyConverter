@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Converts amounts between currencies by cross-rating through the EUR base currency.
+ * Converts amounts between currencies using the rate supplied by an {@link ExchangeRateProvider}.
  */
 @Slf4j
 @Service
@@ -22,12 +22,10 @@ public class CurrencyConversionService {
 
     public ConversionResponse convert(final ConversionRequest request) {
         log.debug("Converting {} {} to {}", request.amount(), request.sourceCurrency(), request.targetCurrency());
-        final BigDecimal sourceRate = exchangeRateProvider.getRateFor(request.sourceCurrency());
-        final BigDecimal targetRate = exchangeRateProvider.getRateFor(request.targetCurrency());
+        final BigDecimal rate = exchangeRateProvider.getRate(request.sourceCurrency(), request.targetCurrency());
 
-        final BigDecimal convertedAmount = request.amount()
-                .multiply(targetRate)
-                .divide(sourceRate, RESULT_SCALE, RoundingMode.HALF_UP);
+        // rounded exactly once, at the end
+        final BigDecimal convertedAmount = request.amount().multiply(rate).setScale(RESULT_SCALE, RoundingMode.HALF_UP);
 
         return new ConversionResponse(convertedAmount);
     }
