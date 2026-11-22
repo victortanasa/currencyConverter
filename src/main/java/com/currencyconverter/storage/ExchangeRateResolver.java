@@ -19,14 +19,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ExchangeRateResolver implements ExchangeRateProvider {
 
-    // keyed on the normalized codes, so " eur " and "EUR" share one entry
-    private static final String CACHE_KEY = "T(com.currencyconverter.util.CurrencyUtils).normalize(#sourceCurrency)"
-            + " + '-' + T(com.currencyconverter.util.CurrencyUtils).normalize(#targetCurrency)";
-
     private final ExchangeRateRepository exchangeRateRepository;
 
     @Override
-    @Cacheable(cacheNames = "rates", key = CACHE_KEY)
+    @Cacheable(cacheNames = RateCache.NAME, key = RateCache.KEY)
     public BigDecimal getRate(final String sourceCurrency, final String targetCurrency) {
         final String source = CurrencyUtils.normalize(sourceCurrency);
         final String target = CurrencyUtils.normalize(targetCurrency);

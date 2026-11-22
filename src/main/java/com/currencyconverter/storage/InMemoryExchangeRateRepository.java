@@ -1,5 +1,6 @@
 package com.currencyconverter.storage;
 
+import com.currencyconverter.exception.UnsupportedCurrencyException;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,7 +48,7 @@ public class InMemoryExchangeRateRepository implements ExchangeRateRepository {
     public void saveRate(final String base, final String quoted, final BigDecimal rate) {
         final Map<String, BigDecimal> quotes = quotesByBase.get(base);
         if (quotes == null) {
-            throw new IllegalArgumentException("Unknown base currency: " + base);
+            throw new UnsupportedCurrencyException(base);
         }
         quotes.put(quoted, rate);
     }
