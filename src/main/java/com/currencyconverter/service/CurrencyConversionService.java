@@ -37,7 +37,12 @@ public class CurrencyConversionService {
 
         final MonetaryAmount converted = Money.of(source.multiply(rate).getNumber(), target).with(roundingFor(target));
 
-        return new ConversionResponse(converted.getNumber().numberValueExact(BigDecimal.class));
+        // Moneta strips trailing zeros (100.00 becomes 1E+2), so restore the currency's scale for the response
+        final BigDecimal convertedAmount = converted.getNumber()
+                .numberValueExact(BigDecimal.class)
+                .setScale(target.getDefaultFractionDigits(), RoundingMode.UNNECESSARY);
+
+        return new ConversionResponse(convertedAmount);
     }
 
     private static MonetaryOperator roundingFor(final CurrencyUnit currency) {

@@ -68,6 +68,19 @@ class CurrencyConversionServiceTest {
     }
 
     @Test
+    void keepsTwoDecimalsForWholeAmounts() {
+        // given
+        when(exchangeRateProvider.getRate(EUR, EUR)).thenReturn(BigDecimal.ONE);
+        final ConversionRequest request = new ConversionRequest(EUR, EUR, new BigDecimal("100"));
+
+        // when
+        final BigDecimal result = currencyConversionService.convert(request).convertedAmount();
+
+        // then
+        assertThat(result.toString()).isEqualTo("100.00");
+    }
+
+    @Test
     void sameCurrencyReturnsSameAmount() {
         // given
         when(exchangeRateProvider.getRate(USD, USD)).thenReturn(BigDecimal.ONE);
