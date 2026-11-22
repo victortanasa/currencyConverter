@@ -32,6 +32,11 @@ this learning project.
   fields instead of `MockitoAnnotations.openMocks(this)` in `@BeforeEach`.
 - Structure test method bodies with `// given`, `// when`, `// then`
   comments marking each section.
+- Stub mocks per test, inside the `// given` block, and only for what that
+  test needs. Don't use `lenient()` or shared `@BeforeEach` stubbing, so
+  Mockito's strict stubs stay enforced.
+- Extract repeated literals (currency codes, rates, etc.) into
+  `private static final` constants instead of repeating them in tests.
 
 ## Project conventions
 - Secrets (API keys, tokens) must never be hardcoded in source or

@@ -22,6 +22,8 @@
         <!-- Override the Spring Boot parent's lombok.version (1.18.34) - that one
              crashes javac on JDK 25 with ExceptionInInitializerError/TypeTag UNKNOWN. -->
         <lombok.version>1.18.38</lombok.version>
+        <!-- Boot 3.3.5's Byte Buddy (1.14.x) cannot instrument JDK 25 classes, which breaks Mockito. -->
+        <byte-buddy.version>1.17.5</byte-buddy.version>
     </properties>
 
     <dependencies>
@@ -33,6 +35,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.6.0</version>
         </dependency>
 
         <dependency>

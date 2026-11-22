@@ -1,13 +1,15 @@
 package com.currencyconverter.dto;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import java.math.BigDecimal;
 
 /**
  * Request payload for a currency conversion.
  */
 public record ConversionRequest(
-        @NotBlank String fromCurrency,
-        @NotBlank String toCurrency,
-        @DecimalMin(value = "0.0", inclusive = false) double amount) {
+        @NotBlank String sourceCurrency,
+        @NotBlank String targetCurrency,
+        @NotNull @Positive BigDecimal amount) {
 }

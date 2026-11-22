@@ -1,11 +1,9 @@
 package com.currencyconverter.dto;
 
+import java.math.BigDecimal;
+
 /**
  * Result of converting an amount from one currency to another.
  */
-public record ConversionResponse(
-        String fromCurrency,
-        String toCurrency,
-        double originalAmount,
-        double convertedAmount) {
+public record ConversionResponse(BigDecimal convertedAmount) {
 }

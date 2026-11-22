@@ -1,0 +1,15 @@
+{
+  "source": "EUR",
+  "quotes": {
+    "EURAUD": 1.639644,
+    "EURBRL": 6.03858,
+    "EURCAD": 1.609968,
+    "EURCHF": 0.940244,
+    "EURGBP": 0.856017,
+    "EURNOK": 10.90808,
+    "EURPLN": 4.325559,
+    "EURRON": 5.246629,
+    "EURSEK": 11.03937,
+    "EURUSD": 1.16063
+  }
+}
