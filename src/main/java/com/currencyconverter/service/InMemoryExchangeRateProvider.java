@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -50,16 +51,26 @@ public class InMemoryExchangeRateProvider implements ExchangeRateProvider {
             return BigDecimal.ONE;
         }
 
-        final BigDecimal direct = ratesBySourceCurrency.getOrDefault(source, Map.of()).get(target);
-        if (direct != null) {
-            return direct;
-        }
+        return directRate(source, target)
+                .or(() -> derivedRate(source, target))
+                .orElseThrow(() -> new UnsupportedCurrencyException(sourceCurrency, targetCurrency));
+    }
 
+    /**
+     * The quote published for exactly this pair, e.g. EURUSD in the EUR block.
+     */
+    private Optional<BigDecimal> directRate(final String source, final String target) {
+        return Optional.ofNullable(ratesBySourceCurrency.getOrDefault(source, Map.of()).get(target));
+    }
+
+    /**
+     * Cross rate through the first base currency that quotes both: target per base / source per base.
+     */
+    private Optional<BigDecimal> derivedRate(final String source, final String target) {
         return ratesBySourceCurrency.values().stream()
                 .filter(quotes -> quotes.containsKey(source) && quotes.containsKey(target))
                 .findFirst()
-                .map(quotes -> quotes.get(target).divide(quotes.get(source), MathContext.DECIMAL128))
-                .orElseThrow(() -> new UnsupportedCurrencyException(sourceCurrency, targetCurrency));
+                .map(quotes -> quotes.get(target).divide(quotes.get(source), MathContext.DECIMAL128));
     }
 
     private void validateCurrency(final String normalizedCode, final String originalCode) {
