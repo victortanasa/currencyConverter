@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -32,13 +32,13 @@ public class ExchangeRatesLoader {
      * @throws IllegalStateException if the content is empty, has a duplicate base or an invalid entry
      */
     public Map<String, Map<String, BigDecimal>> load(final Resource location) {
-        final List<ExchangeRatesData> blocks = read(location);
-        if (blocks == null || blocks.isEmpty()) {
-            throw new IllegalStateException("Exchange rates file has no rate blocks: " + location);
+        final List<ExchangeRatesData> exchangeRatesList = read(location);
+        if (exchangeRatesList == null || exchangeRatesList.isEmpty()) {
+            throw new IllegalStateException("Exchange rates file has no rate exchangeRatesList: " + location);
         }
 
         final Map<String, Map<String, BigDecimal>> ratesBySourceCurrency = new LinkedHashMap<>();
-        for (final ExchangeRatesData block : blocks) {
+        for (final ExchangeRatesData block : exchangeRatesList) {
             final String base = baseOf(block, location);
             if (ratesBySourceCurrency.put(base, quotesOf(base, block)) != null) {
                 throw new IllegalStateException("Duplicate base currency " + base + " in " + location);
