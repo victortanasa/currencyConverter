@@ -17,7 +17,8 @@ public class ExchangeRatesConfig {
     public InMemoryExchangeRateRepository exchangeRateRepository(
             final ExchangeRatesLoader exchangeRatesLoader,
             @Value("${exchange-rates.location:classpath:rates.json}") final Resource location) {
-        final InMemoryExchangeRateRepository repository = new InMemoryExchangeRateRepository(exchangeRatesLoader.load(location));
+        final InMemoryExchangeRateRepository repository = new InMemoryExchangeRateRepository(
+                exchangeRatesLoader.load(location));
         log.info("Loaded rates for {} base currencies from {}", repository.baseCount(), location);
         return repository;
     }

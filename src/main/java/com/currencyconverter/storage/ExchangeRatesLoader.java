@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class ExchangeRatesLoader {
     public Map<String, Map<String, BigDecimal>> load(final Resource location) {
         final List<ExchangeRatesData> exchangeRatesList = read(location);
         if (exchangeRatesList == null || exchangeRatesList.isEmpty()) {
-            throw new IllegalStateException("Exchange rates file has no rate exchangeRatesList: " + location);
+            throw new IllegalStateException("Exchange rates file has no rate blocks: " + location);
         }
 
         final Map<String, Map<String, BigDecimal>> ratesBySourceCurrency = new LinkedHashMap<>();
@@ -73,10 +74,10 @@ public class ExchangeRatesLoader {
     }
 
     private static String quotedCurrencyOf(final String base, final String pair, final BigDecimal rate) {
-        final boolean validPair = pair.startsWith(base) && pair.length() > base.length();
+        final boolean validPair = pair.toUpperCase(Locale.ROOT).startsWith(base) && pair.length() > base.length();
         if (!validPair || rate == null || rate.signum() <= 0) {
             throw new IllegalStateException("Invalid exchange rate entry: " + pair + "=" + rate);
         }
-        return pair.substring(base.length());
+        return CurrencyUtils.normalize(pair.substring(base.length()));
     }
 }
