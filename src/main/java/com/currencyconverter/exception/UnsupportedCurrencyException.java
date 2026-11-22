@@ -1,4 +1,4 @@
-package com.currencyconverter.service;
+package com.currencyconverter.exception;
 
 /**
  * Thrown when a conversion is requested for a currency, or a currency pair,

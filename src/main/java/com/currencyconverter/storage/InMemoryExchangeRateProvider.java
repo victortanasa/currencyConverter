@@ -1,5 +1,6 @@
-package com.currencyconverter.service;
+package com.currencyconverter.storage;
 
+import com.currencyconverter.exception.UnsupportedCurrencyException;
 import com.currencyconverter.util.CurrencyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

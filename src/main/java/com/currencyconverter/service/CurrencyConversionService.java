@@ -2,6 +2,7 @@ package com.currencyconverter.service;
 
 import com.currencyconverter.dto.ConversionRequest;
 import com.currencyconverter.dto.ConversionResponse;
+import com.currencyconverter.storage.ExchangeRateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.javamoney.moneta.Money;

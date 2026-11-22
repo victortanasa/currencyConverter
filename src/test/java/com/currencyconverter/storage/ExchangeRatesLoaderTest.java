@@ -1,4 +1,4 @@
-package com.currencyconverter.service;
+package com.currencyconverter.storage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

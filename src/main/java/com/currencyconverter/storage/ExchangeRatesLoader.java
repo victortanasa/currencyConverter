@@ -1,4 +1,4 @@
-package com.currencyconverter.service;
+package com.currencyconverter.storage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.currencyconverter.util.CurrencyUtils;

@@ -1,4 +1,6 @@
-package com.currencyconverter.service;
+package com.currencyconverter.storage;
+
+import com.currencyconverter.exception.UnsupportedCurrencyException;
 
 import java.math.BigDecimal;
 

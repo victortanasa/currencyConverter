@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.currencyconverter.dto.ConversionResponse;
 import com.currencyconverter.service.CurrencyConversionService;
-import com.currencyconverter.service.UnsupportedCurrencyException;
+import com.currencyconverter.exception.UnsupportedCurrencyException;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

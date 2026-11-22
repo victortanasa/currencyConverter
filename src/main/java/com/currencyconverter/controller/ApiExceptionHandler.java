@@ -1,6 +1,6 @@
 package com.currencyconverter.controller;
 
-import com.currencyconverter.service.UnsupportedCurrencyException;
+import com.currencyconverter.exception.UnsupportedCurrencyException;
 import java.util.List;
 
 import lombok.NonNull;
