@@ -24,9 +24,6 @@ class ExchangeRateCachingTest {
     @Autowired
     private CacheManager cacheManager;
 
-    @Autowired
-    private ExchangeRateService exchangeRateService;
-
     @Test
     void cachesRatesUnderNormalizedKey() {
         // given
@@ -57,27 +54,5 @@ class ExchangeRateCachingTest {
 
         // then
         assertThat(cache.get("EUR-XYZ")).isNull();
-    }
-
-    @Test
-    void updatingRateEvictsOnlyThatEntryAndServesNewRate() {
-        // given
-        final Cache cache = cacheManager.getCache(RATES_CACHE);
-        cache.clear();
-        final BigDecimal original = exchangeRateProvider.getRate("EUR", "USD");
-        exchangeRateProvider.getRate("EUR", "GBP");
-        final BigDecimal updated = new BigDecimal("1.5");
-
-        try {
-            // when
-            exchangeRateService.updateRate("eur", "usd", updated);
-
-            // then
-            assertThat(cache.get("EUR-USD")).isNull();
-            assertThat(cache.get("EUR-GBP")).isNotNull();
-            assertThat(exchangeRateProvider.getRate("EUR", "USD")).isEqualByComparingTo(updated);
-        } finally {
-            exchangeRateService.updateRate("EUR", "USD", original);
-        }
     }
 }

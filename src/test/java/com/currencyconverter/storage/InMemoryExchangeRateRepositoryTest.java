@@ -1,9 +1,7 @@
 package com.currencyconverter.storage;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.currencyconverter.exception.UnsupportedCurrencyException;
 import java.math.BigDecimal;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -52,29 +50,5 @@ class InMemoryExchangeRateRepositoryTest {
         assertThat(repository.isKnownCurrency(EUR)).isTrue();
         assertThat(repository.isKnownCurrency(CAD)).isTrue();
         assertThat(repository.isKnownCurrency(UNKNOWN)).isFalse();
-    }
-
-    @Test
-    void savesRateOverwritingExistingAndAddingNew() {
-        // given
-        final InMemoryExchangeRateRepository repository = createRepository();
-
-        // when
-        repository.saveRate(EUR, USD, new BigDecimal("1.5"));
-        repository.saveRate(EUR, CAD, new BigDecimal("1.45"));
-
-        // then
-        assertThat(repository.findRate(EUR, USD)).contains(new BigDecimal("1.5"));
-        assertThat(repository.findRate(EUR, CAD)).contains(new BigDecimal("1.45"));
-    }
-
-    @Test
-    void rejectsSavingRateForUnknownBase() {
-        // given
-        final InMemoryExchangeRateRepository repository = createRepository();
-
-        // when / then
-        assertThatThrownBy(() -> repository.saveRate(UNKNOWN, USD, BigDecimal.ONE))
-                .isInstanceOf(UnsupportedCurrencyException.class);
     }
 }

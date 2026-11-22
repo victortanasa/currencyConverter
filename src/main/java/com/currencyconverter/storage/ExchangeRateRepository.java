@@ -1,6 +1,5 @@
 package com.currencyconverter.storage;
 
-import com.currencyconverter.exception.UnsupportedCurrencyException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +20,4 @@ public interface ExchangeRateRepository {
     List<String> findBasesQuoting(String first, String second);
 
     boolean isKnownCurrency(String currency);
-
-    /**
-     * Replaces the quote of {@code quoted} against {@code base}.
-     *
-     * @throws UnsupportedCurrencyException if {@code base} is not a known base currency
-     */
-    void saveRate(String base, String quoted, BigDecimal rate);
 }

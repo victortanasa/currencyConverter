@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * Name and key format of the rates cache, shared by whoever fills or evicts it. Entries are keyed on the
+ * Name and key format of the rates cache, used by the resolver that fills it. Entries are keyed on the
  * normalized codes, so " eur " and "EUR" share one entry. Methods using {@link #KEY} must name their
  * parameters {@code sourceCurrency} and {@code targetCurrency}.
  */

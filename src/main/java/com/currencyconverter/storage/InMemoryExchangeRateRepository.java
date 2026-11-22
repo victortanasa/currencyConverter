@@ -1,16 +1,14 @@
 package com.currencyconverter.storage;
 
-import com.currencyconverter.exception.UnsupportedCurrencyException;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Keeps the rates in memory. The set of base currencies is fixed after loading, and each base's quotes
- * live in a concurrent map so single rates can be replaced while requests are being served.
+ * Keeps the rates in memory. The data is immutable after loading, and the base currencies keep their
+ * loading order.
  */
 public class InMemoryExchangeRateRepository implements ExchangeRateRepository {
 
@@ -18,7 +16,7 @@ public class InMemoryExchangeRateRepository implements ExchangeRateRepository {
 
     public InMemoryExchangeRateRepository(final Map<String, Map<String, BigDecimal>> quotesByBase) {
         this.quotesByBase = new LinkedHashMap<>();
-        quotesByBase.forEach((base, quotes) -> this.quotesByBase.put(base, new ConcurrentHashMap<>(quotes)));
+        quotesByBase.forEach((base, quotes) -> this.quotesByBase.put(base, Map.copyOf(quotes)));
     }
 
     public int baseCount() {
@@ -42,14 +40,5 @@ public class InMemoryExchangeRateRepository implements ExchangeRateRepository {
     public boolean isKnownCurrency(final String currency) {
         return quotesByBase.containsKey(currency)
                 || quotesByBase.values().stream().anyMatch(quotes -> quotes.containsKey(currency));
-    }
-
-    @Override
-    public void saveRate(final String base, final String quoted, final BigDecimal rate) {
-        final Map<String, BigDecimal> quotes = quotesByBase.get(base);
-        if (quotes == null) {
-            throw new UnsupportedCurrencyException(base);
-        }
-        quotes.put(quoted, rate);
     }
 }
