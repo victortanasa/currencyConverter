@@ -35,7 +35,7 @@ class CurrencyConverterApplicationTest {
 
         // then
         assertThat(eurToUsd).isEqualByComparingTo("1.16063");
-        assertThat(usdToEur).isEqualByComparingTo("0.90992");
+        assertThat(usdToEur).isEqualByComparingTo("0.861601");
     }
 
     @Test

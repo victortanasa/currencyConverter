@@ -17,31 +17,31 @@
   {
     "source": "USD",
     "quotes": {
-      "USDAUD": 1.5002,
-      "USDBRL": 5.938,
-      "USDCAD": 1.4307,
-      "USDCHF": 0.83922,
-      "USDEUR": 0.90992,
-      "USDGBP": 0.76192,
-      "USDNOK": 9.7525,
-      "USDPLN": 4.0567,
-      "USDRON": 4.8674,
-      "USDSEK": 10.2025
+      "USDAUD": 1.412719,
+      "USDBRL": 5.202847,
+      "USDCAD": 1.38715,
+      "USDCHF": 0.810115,
+      "USDEUR": 0.861601,
+      "USDGBP": 0.737545,
+      "USDNOK": 9.398413,
+      "USDPLN": 3.726906,
+      "USDRON": 4.520501,
+      "USDSEK": 9.511533
     }
   },
   {
     "source": "RON",
     "quotes": {
-      "RONAUD": 0.30821,
-      "RONBRL": 1.22,
-      "RONCAD": 0.29393,
-      "RONCHF": 0.17242,
-      "RONEUR": 0.18694,
-      "RONGBP": 0.15653,
-      "RONNOK": 2.0036,
-      "RONPLN": 0.83344,
-      "RONSEK": 2.0961,
-      "RONUSD": 0.20545
+      "RONAUD": 0.312514,
+      "RONBRL": 1.150945,
+      "RONCAD": 0.306858,
+      "RONCHF": 0.179209,
+      "RONEUR": 0.190599,
+      "RONGBP": 0.163156,
+      "RONNOK": 2.079064,
+      "RONPLN": 0.824445,
+      "RONSEK": 2.104088,
+      "RONUSD": 0.221214
     }
   }
 ]
